@@ -30,6 +30,7 @@ function App() {
   const [showGroupModal, setShowGroupModal] = useState(false);
   const [showMemberModal, setShowMemberModal] = useState(false);
   const [showUserModal, setShowUserModal] = useState(false);
+  const [loginUserId, setLoginUserId] = useState('');
   const [showLeaveModal, setShowLeaveModal] = useState(false);
   
   // Group creation Form State
@@ -114,6 +115,69 @@ function App() {
       }
     } catch (e) {
       console.error('Error fetching groups:', e);
+    }
+  };
+
+  // --- ADD MEMBER / CREATE USER ---
+  const handleCreateUser = async () => {
+    if (!newUserName || newUserName.trim() === '') return null;
+    try {
+      const res = await fetch(`${API_BASE}/users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newUserName.trim(), email: newUserEmail.trim() || undefined }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        alert(`Failed to create user: ${err.error}`);
+        return null;
+      }
+      const user = await res.json();
+      await fetchUsers();
+      setNewUserName('');
+      setNewUserEmail('');
+      return user;
+    } catch (err) {
+      console.error('Error creating user:', err);
+      return null;
+    }
+  };
+
+  const handleAddMember = async (e) => {
+    e && e.preventDefault();
+    if (!activeGroup) return;
+
+    let userIdToAdd = addMemberUserId;
+    if (!userIdToAdd) {
+      alert('Select a user or create a new one');
+      return;
+    }
+
+    try {
+      if (userIdToAdd === 'CREATE_NEW') {
+        const created = await handleCreateUser();
+        if (!created) return;
+        userIdToAdd = String(created.id);
+      }
+
+      const res = await fetch(`${API_BASE}/groups/${activeGroup.id}/members`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: parseInt(userIdToAdd, 10), joinedAt: addMemberJoinDate }),
+      });
+
+      if (res.ok) {
+        setShowMemberModal(false);
+        setAddMemberUserId('');
+        await fetchGroupMembers(activeGroup.id);
+        await fetchGroups();
+      } else {
+        const err = await res.json();
+        alert(`Error adding member: ${err.error}`);
+      }
+    } catch (err) {
+      console.error('Error adding member:', err);
+      alert('Server error adding member');
     }
   };
 
@@ -486,6 +550,7 @@ function App() {
               <option key={usr.id} value={usr.id}>{usr.name} (View App)</option>
             ))}
           </select>
+          <button className="btn" onClick={() => setShowUserModal(true)}>Sign In / Register</button>
         </div>
       </header>
 
@@ -517,6 +582,7 @@ function App() {
               }}>
                 + Add Expense
               </button>
+              <button className="btn" onClick={() => setShowMemberModal(true)}>+ Add Member</button>
               <button className="btn btn-primary" onClick={() => {
                 setSetFrom(String(currentUser?.id || ''));
                 setShowSettlementModal(true);
@@ -1179,6 +1245,104 @@ function App() {
             <div className="modal-footer">
               <button type="button" className="btn" onClick={() => setShowExpenseModal(false)}>Cancel</button>
               <button type="submit" className="btn btn-success">Save Expense</button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* --- MODAL: ADD MEMBER --- */}
+      {showMemberModal && activeGroup && (
+        <div className="modal-overlay">
+          <form className="modal-content" onSubmit={handleAddMember}>
+            <div className="modal-header">
+              <h3>Add Member to {activeGroup.name}</h3>
+              <button type="button" className="btn" style={{ padding: '0.2rem 0.5rem' }} onClick={() => setShowMemberModal(false)}>X</button>
+            </div>
+
+            <div className="modal-body">
+              <div className="form-group">
+                <label className="form-label">Select Existing User</label>
+                <select className="form-select" value={addMemberUserId} onChange={(e) => setAddMemberUserId(e.target.value)}>
+                  <option value="">-- Select user --</option>
+                  {users.map(u => (
+                    <option key={u.id} value={u.id}>{u.name} ({u.email || 'no-email'})</option>
+                  ))}
+                  <option value="CREATE_NEW">+ Create new user...</option>
+                </select>
+              </div>
+
+              {addMemberUserId === 'CREATE_NEW' && (
+                <div style={{ marginTop: '0.75rem' }}>
+                  <div className="form-group">
+                    <label className="form-label">New User Name</label>
+                    <input className="form-input" value={newUserName} onChange={(e) => setNewUserName(e.target.value)} />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">New User Email (optional)</label>
+                    <input className="form-input" value={newUserEmail} onChange={(e) => setNewUserEmail(e.target.value)} />
+                  </div>
+                </div>
+              )}
+
+              <div className="form-group" style={{ marginTop: '0.75rem' }}>
+                <label className="form-label">Join Date</label>
+                <input type="date" className="form-input" value={addMemberJoinDate} onChange={(e) => setAddMemberJoinDate(e.target.value)} />
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button type="button" className="btn" onClick={() => setShowMemberModal(false)}>Cancel</button>
+              <button type="submit" className="btn btn-primary">Add Member</button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* --- MODAL: SIGN IN / REGISTER --- */}
+      {showUserModal && (
+        <div className="modal-overlay">
+          <form className="modal-content" onSubmit={async (e) => {
+            e.preventDefault();
+            if (loginUserId && loginUserId !== 'CREATE_NEW') {
+              const u = users.find(x => x.id === parseInt(loginUserId, 10));
+              if (u) setCurrentUser(u);
+              setShowUserModal(false);
+              return;
+            }
+            if (!newUserName || newUserName.trim() === '') { alert('Enter a name'); return; }
+            const created = await handleCreateUser();
+            if (created) setCurrentUser(created);
+            setShowUserModal(false);
+          }}>
+            <div className="modal-header">
+              <h3>Sign In / Register</h3>
+              <button type="button" className="btn" style={{ padding: '0.2rem 0.5rem' }} onClick={() => setShowUserModal(false)}>X</button>
+            </div>
+            <div className="modal-body">
+              <div className="form-group">
+                <label className="form-label">Choose existing user</label>
+                <select className="form-select" value={loginUserId} onChange={(e) => setLoginUserId(e.target.value)}>
+                  <option value="">-- Select --</option>
+                  {users.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                  <option value="CREATE_NEW">+ Create new account...</option>
+                </select>
+              </div>
+              {loginUserId === 'CREATE_NEW' && (
+                <>
+                  <div className="form-group">
+                    <label className="form-label">Name</label>
+                    <input className="form-input" value={newUserName} onChange={(e) => setNewUserName(e.target.value)} />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Email (optional)</label>
+                    <input className="form-input" value={newUserEmail} onChange={(e) => setNewUserEmail(e.target.value)} />
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn" onClick={() => setShowUserModal(false)}>Cancel</button>
+              <button type="submit" className="btn btn-primary">Sign In</button>
             </div>
           </form>
         </div>
