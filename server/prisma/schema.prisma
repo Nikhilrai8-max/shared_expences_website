@@ -1,0 +1,102 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              Int              @id @default(autoincrement())
+  name            String           @unique
+  email           String?
+  memberships     Membership[]
+  paidExpenses    Expense[]        @relation("PaidExpenses")
+  splits          Split[]
+  settlementsFrom Settlement[]     @relation("SettlementsFrom")
+  settlementsTo   Settlement[]     @relation("SettlementsTo")
+}
+
+model Group {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique
+  description String?
+  memberships Membership[]
+  expenses    Expense[]
+  settlements Settlement[]
+}
+
+model Membership {
+  id       Int       @id @default(autoincrement())
+  groupId  Int
+  userId   Int
+  joinedAt DateTime
+  leftAt   DateTime?
+  group    Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+}
+
+model Expense {
+  id           Int      @id @default(autoincrement())
+  csvId        Int?
+  groupId      Int
+  description  String
+  amount       Float
+  currency     String
+  date         DateTime
+  paidById     Int
+  splitType    String   // EQUAL, PERCENTAGE, EXACT
+  isSettlement Boolean  @default(false)
+  status       String   @default("APPROVED") // APPROVED, PENDING, REJECTED
+  group        Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  paidBy       User     @relation("PaidExpenses", fields: [paidById], references: [id], onDelete: Cascade)
+  splits       Split[]
+}
+
+model Split {
+  id        Int     @id @default(autoincrement())
+  expenseId Int
+  userId    Int
+  amount    Float
+  percentage Float?
+  expense   Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([expenseId, userId])
+}
+
+model Settlement {
+  id         Int      @id @default(autoincrement())
+  groupId    Int
+  fromUserId Int
+  toUserId   Int
+  amount     Float
+  currency   String
+  date       DateTime
+  isApproved Boolean  @default(true)
+  group      Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  fromUser   User     @relation("SettlementsFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser     User     @relation("SettlementsTo", fields: [toUserId], references: [id], onDelete: Cascade)
+}
+
+model ImportAnomaly {
+  id             Int     @id @default(autoincrement())
+  csvRow         Int
+  csvId          String?
+  date           String?
+  description    String?
+  amount         String?
+  currency       String?
+  paidBy         String?
+  splitType      String?
+  participants   String?
+  shares         String?
+  groupName      String?
+  issueType      String
+  message        String
+  resolvedStatus String  @default("PENDING") // PENDING, APPROVED, IGNORED
+  proposedFix    String? // JSON string containing suggested fixes, e.g. corrected split or amount
+}

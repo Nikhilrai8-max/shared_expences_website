@@ -1,0 +1,111 @@
+id,date,description,amount,currency,paid_by,split_type,participants,shares,group
+1,2025-02-01,Expense 1,1010,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+2,2025-02-02,Expense 2,1020,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+3,2025-02-03,Expense 3,1030,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+4,2025-02-04,Expense 4,1040,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+5,2025-02-05,Expense 5,1050,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+6,2025-02-06,Expense 6,1060,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+7,2025-02-07,Expense 7,1070,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+8,2025-02-08,Expense 8,1080,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+9,2025-02-09,Expense 9,1090,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+10,2025-02-10,Expense 10,1100,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+11,2025-02-11,Expense 11,1110,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+12,2025-02-12,Expense 12,1120,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+13,2025-02-13,Expense 13,1130,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+14,2025-02-14,Expense 14,1140,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+15,2025-02-15,Expense 15,1150,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+16,2025-02-16,Expense 16,1160,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+17,2025-02-17,Expense 17,1170,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+18,2025-02-18,Expense 18,1180,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+19,2025-02-19,Expense 19,1190,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+20,2025-02-20,Expense 20,1200,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+21,2025-02-21,Expense 21,1210,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+22,2025-02-22,Expense 22,1220,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+23,2025-02-23,Expense 23,1230,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+24,2025-02-24,Expense 24,1240,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+25,2025-02-25,Expense 25,1250,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+26,2025-03-01,Expense 26,1260,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+27,2025-03-02,Expense 27,1270,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+28,2025-03-03,Expense 28,1280,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+29,2025-03-04,Expense 29,1290,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+30,2025-03-05,Expense 30,1300,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+31,2025-03-06,Expense 31,1310,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+32,2025-03-07,Expense 32,1320,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+33,2025-03-08,Expense 33,1330,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+34,2025-03-09,Expense 34,1340,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+35,2025-03-10,Expense 35,1350,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+36,2025-03-11,Expense 36,1360,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+37,2025-03-12,Expense 37,1370,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+38,2025-03-13,Expense 38,1380,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+39,2025-03-14,Expense 39,1390,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+40,2025-03-15,Expense 40,1400,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+41,2025-03-16,Expense 41,1410,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+42,2025-03-17,Expense 42,1420,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+43,2025-03-18,Expense 43,1430,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+44,2025-03-19,Expense 44,1440,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+45,2025-03-20,Expense 45,1450,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+46,2025-03-21,Expense 46,1460,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+47,2025-03-22,Expense 47,1470,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+48,2025-03-23,Expense 48,1480,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+49,2025-03-24,Expense 49,1490,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+50,2025-03-25,Expense 50,1500,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+51,2025-04-01,Expense 51,1510,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+52,2025-04-02,Expense 52,1520,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+53,2025-04-03,Expense 53,1530,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+54,2025-04-04,Expense 54,1540,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+55,2025-04-05,Expense 55,1550,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+56,2025-04-06,Expense 56,1560,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+57,2025-04-07,Expense 57,1570,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+58,2025-04-08,Expense 58,1580,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+59,2025-04-09,Expense 59,1590,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+60,2025-04-10,Expense 60,1600,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+61,2025-04-11,Expense 61,1610,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+62,2025-04-12,Expense 62,1620,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+63,2025-04-13,Expense 63,1630,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+64,2025-04-14,Expense 64,1640,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+65,2025-04-15,Expense 65,1650,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+66,2025-04-16,Expense 66,1660,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+67,2025-04-17,Expense 67,1670,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+68,2025-04-18,Expense 68,1680,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+69,2025-04-19,Expense 69,1690,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+70,2025-04-20,Expense 70,1700,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+71,2025-04-21,Expense 71,1710,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+72,2025-04-22,Expense 72,1720,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+73,2025-04-23,Expense 73,1730,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+74,2025-04-24,Expense 74,1740,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+75,2025-04-25,Expense 75,1750,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+76,2025-05-01,Expense 76,1760,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+77,2025-05-02,Expense 77,1770,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+78,2025-05-03,Expense 78,1780,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+79,2025-05-04,Expense 79,1790,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+80,2025-05-05,Expense 80,1800,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+81,2025-03-10,Grocery Shopping,3200,INR,Rohan,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+82,2025-03-10,Grocery Shopping,3200,INR,Rohan,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+83,2025-13-01,Invalid Date,1000,INR,Aisha,EQUAL,"Aisha|Rohan","",Flat
+84,2025-02-30,Invalid Date 2,1000,INR,Aisha,EQUAL,"Aisha|Rohan","",Flat
+85,2025-03-15,Refund Electricity,-500,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+86,2025-03-20,Movie Night,1000,INR,,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+87,2025-03-25,Cab Ride,600,INR,UnknownUser,EQUAL,"Aisha|Rohan|Priya|Meera","",Flat
+88,2025-04-01,Trip Hotel,250,USD,Aisha,EQUAL,"Aisha|Rohan|Priya|Dev","",Trip
+89,2025-04-02,Trip Taxi,80,USD,Rohan,PERCENTAGE,"Aisha|Rohan|Priya|Dev","40|30|20|10",Trip
+90,2025-04-03,Trip Food,120,USD,Priya,EXACT,"Aisha|Rohan|Priya|Dev","30|30|40|20",Trip
+91,2025-04-04,European Hotel,100,EUR,Aisha,EQUAL,"Aisha|Rohan|Priya|Dev","",Trip
+92,2025-04-05,Unknown Currency,1000,XYZ,Aisha,EQUAL,"Aisha|Rohan|Priya|Sam","",Flat
+93,2025-04-06,Settlement To Aisha,2000,INR,Rohan,EQUAL,"Aisha","",Flat
+94,2025-04-07,Transfer To Priya,1500,INR,Aisha,EQUAL,"Priya","",Flat
+95,2025-04-08,Percentage Error,1000,INR,Aisha,PERCENTAGE,"Aisha|Rohan|Priya","40|30|20",Flat
+96,2025-04-09,Percentage Over,1000,INR,Aisha,PERCENTAGE,"Aisha|Rohan|Priya","50|50|50",Flat
+97,2025-04-10,Exact Split Error,1000,INR,Aisha,EXACT,"Aisha|Rohan|Priya","200|200|200",Flat
+98,2025-04-11,Empty Participants,1000,INR,Aisha,EQUAL,"","",Flat
+99,2025-04-12,Single Participant,500,INR,Aisha,EQUAL,"Aisha","",Flat
+100,2025-04-13,,800,INR,Aisha,EQUAL,"Aisha|Rohan","",Flat
+100,2025-04-14,Duplicate ID,900,INR,Aisha,EQUAL,"Aisha|Rohan","",Flat
+102,2025-04-15,Huge Expense,999999,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Sam","",Flat
+103,2025-04-16,Decimal Amount,1234.57,INR,Aisha,EQUAL,"Aisha|Rohan|Priya|Sam","",Flat
+104,2025-04-17,Trailing Space,1000,INR,"Aisha ",EQUAL,"Aisha|Rohan","",Flat
+105,2025-04-18,Case Variation,1000,INR,rohan,EQUAL,"Aisha|Rohan","",Flat
+106,2025-04-19,Invalid Split Type,1000,INR,Aisha,CUSTOM,"Aisha|Rohan","",Flat
+107,2030-01-01,Future Expense,1000,INR,Aisha,EQUAL,"Aisha|Rohan","",Flat
+108,2025-03-20,Sam Before Joining,1000,INR,Aisha,EQUAL,"Aisha|Rohan|Sam","",Flat
+109,2025-04-30,Meera After Leaving,1000,INR,Aisha,EQUAL,"Aisha|Rohan|Meera","",Flat
+110,2025-04-20,Zero Amount,0,INR,Aisha,EQUAL,"Aisha|Rohan","",Flat

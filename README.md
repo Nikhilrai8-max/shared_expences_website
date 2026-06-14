@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Shared Expenses Tracker (Brutalist boxy Edition)
 
-## Getting Started
+A professional React + Node/Express + SQLite shared expenses web application built for a group of 6 flatmates (Aisha, Rohan, Priya, Meera, Sam, Dev) to ingest their messy historical spreadsheet, resolve anomalies interactively, track balance ledgers, and minimize peer-to-peer debts.
 
-First, run the development server:
+Designed with a premium dark-themed boxy aesthetic enforcing strictly **zero rounded corners** (`border-radius: 0px !important`).
 
+---
+
+## 🛠️ Stack & Architecture
+
+- **Frontend**: React (Vite-based Single Page App) styled with Vanilla CSS.
+- **Backend**: Node.js & Express API server.
+- **Database**: SQLite (relational DB) managed via Prisma ORM.
+- **Math Engine**:
+  - Net balance tracking with multi-currency conversion to base `INR` (using rates: 1 USD = 83 INR, 1 EUR = 90 INR).
+  - Date-aware membership validation preventing timeline violations.
+  - Splitwise-style greedy debt minimization algorithm.
+  - Granular itemized ledger audit trail.
+
+---
+
+## 🚀 Quick Start Instructions
+
+Follow these steps to run the application locally on Windows. Make sure you have **Node.js (v18+)** and **npm** installed.
+
+### 1. Install Dependencies
+Run the installation script from the root directory to install both frontend and backend packages:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run install:all
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Initialize Database & Seed
+Create the SQLite database, generate the Prisma Client, and seed the default flatmates and membership dates:
+```bash
+npm run init:db
+npm run seed:db
+```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### 3. Run the Servers Concurrently
+Start the Express API server (port 5000) and Vite React client (port 5173):
+- **Terminal 1 (Start Backend)**:
+  ```bash
+  npm run start:server
+  ```
+- **Terminal 2 (Start Frontend)**:
+  ```bash
+  npm run start:client
+  ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Once both are running, open your browser and navigate to:
+👉 **[http://localhost:5173](http://localhost:5173)**
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🧪 Verification & Automated Testing
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+You can verify the database transactions, currency conversions, and debt minimizer calculations programmatically on the real spreadsheet by running the automated test script:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+node server/test-import.js
+```
 
-## Deploy on Vercel
+This script will:
+1. Parse `shared_expenses_extended.csv` from the root workspace.
+2. Run validation checks to detect all 20 anomalies.
+3. Simulate user-approved ingestion.
+4. Log database transactions.
+5. Calculate and print group balances and simplified debt checklists in terminal tables.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📂 Core Project Layout
+
+- `/client` - React frontend application.
+  - `/client/src/App.jsx` - Primary React component containing dashboard views, ledger tables, and importer controls.
+  - `/client/src/index.css` - Global Vanilla CSS design system (strictly `border-radius: 0px`).
+- `/server` - Express backend API server.
+  - `/server/index.js` - API routing and controller endpoints.
+  - `/server/prisma/schema.prisma` - SQLite database schema definition.
+  - `/server/services/importer.js` - CSV parsing and 18+ anomaly checking logic.
+  - `/server/services/calculations.js` - Multi-currency net balances, debt minimizer, and ledger audit builder.
+  - `/server/test-import.js` - Programmatic verification suite.
+- `shared_expenses_extended.csv` - The original export containing deliberate data problems.
+- `SCOPE.md` - Entity Relationship database schema and 20-anomaly log.
+- `DECISIONS.md` - Technical choices, options considered, and design rationales.
+- `AI_USAGE.md` - AI tool log and detailed debugging case studies.

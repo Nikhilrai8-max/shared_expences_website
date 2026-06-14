@@ -1,22 +1,12 @@
 {
-  "name": "spreetail",
-  "version": "0.1.0",
-  "private": true,
+  "name": "shared-expenses-monorepo",
+  "version": "1.0.0",
+  "description": "Root package.json for Shared Expenses Tracker",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
-  },
-  "dependencies": {
-    "next": "16.2.9",
-    "react": "19.2.4",
-    "react-dom": "19.2.4"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.9",
-    "tailwindcss": "^4"
+    "install:all": "npm install --prefix server && npm install --prefix client",
+    "init:db": "npm run db:init --prefix server",
+    "seed:db": "npm run db:seed --prefix server",
+    "start:server": "npm run dev --prefix server",
+    "start:client": "npm run dev --prefix client"
   }
 }
