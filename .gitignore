@@ -52,3 +52,5 @@ next-env.d.ts
 /client/dist
 /server/dist
 
+
+/generated/prisma

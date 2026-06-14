@@ -1,16 +1,18 @@
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { PrismaClient } from '@prisma/client';
 import { analyzeCSV, normalizeName } from './services/importer.js';
 import { calculateBalances } from './services/calculations.js';
 
 const prisma = new PrismaClient();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 async function runTest() {
   console.log('=== RUNNING AUTOMATED IMPORT TEST ===');
   
   // 1. Read CSV File
-  const csvPath = path.resolve('shared_expenses_extended.csv');
+  const csvPath = path.resolve(__dirname, '..', 'shared_expenses_extended.csv');
   console.log(`Reading CSV from: ${csvPath}`);
   const csvContent = fs.readFileSync(csvPath, 'utf-8');
 
@@ -92,144 +94,156 @@ async function runTest() {
     }
   }
 
-  // 4. Ingest into Database in transaction
+  // 4. Ingest into Database in batches without a single long-running transaction
   console.log(`Ingesting ${finalizedRows.length} resolved rows into DB...`);
-  
-  await prisma.$transaction(async (tx) => {
-    // Clean tables
-    await tx.split.deleteMany({});
-    await tx.expense.deleteMany({});
-    await tx.settlement.deleteMany({});
-    await tx.importAnomaly.deleteMany({});
 
-    for (const row of finalizedRows) {
-      if (row.action === 'SKIP' || row.action === 'DELETE') continue;
+  await prisma.split.deleteMany({});
+  await prisma.expense.deleteMany({});
+  await prisma.settlement.deleteMany({});
+  await prisma.importAnomaly.deleteMany({});
 
-      const rawGroup = row.groupName || 'Flat';
-      const groupObj = groupMap[rawGroup];
-      if (!groupObj) throw new Error(`Group ${rawGroup} not found`);
-      const groupId = groupObj.id;
+  for (const row of finalizedRows) {
+    if (row.action === 'SKIP' || row.action === 'DELETE') continue;
 
-      const dateObj = new Date(row.date);
-      const payerName = normalizeName(row.paidBy);
-      const payerObj = userMap[payerName];
-      if (!payerObj) throw new Error(`User ${row.paidBy} not found`);
-      const paidById = payerObj.id;
+    const rawGroup = row.groupName || 'Flat';
+    const groupObj = groupMap[rawGroup];
+    if (!groupObj) throw new Error(`Group ${rawGroup} not found`);
+    const groupId = groupObj.id;
 
-      const amount = parseFloat(row.amountStr || row.amount);
-      const currency = (row.currency || 'INR').trim().toUpperCase();
+    const dateObj = new Date(row.date);
+    const payerName = normalizeName(row.paidBy);
+    const payerObj = userMap[payerName];
+    if (!payerObj) throw new Error(`User ${row.paidBy} not found`);
+    const paidById = payerObj.id;
 
-      if (row.isSettlement === true) {
-        // Find recipient from description
-        let toUserName = '';
-        const desc = (row.description || '').toLowerCase();
-        if (desc.includes('to aisha') || row.participantsStr === 'Aisha') toUserName = 'Aisha';
-        else if (desc.includes('to priya') || row.participantsStr === 'Priya') toUserName = 'Priya';
-        else if (desc.includes('to meera') || row.participantsStr === 'Meera') toUserName = 'Meera';
-        else if (desc.includes('to rohan') || row.participantsStr === 'Rohan') toUserName = 'Rohan';
-        else {
-          const parts = (row.participantsStr || '').split('|').map(p => normalizeName(p.trim()));
-          toUserName = parts[0] || 'Aisha';
-        }
+    const amount = parseFloat(row.amountStr || row.amount);
+    const currency = (row.currency || 'INR').trim().toUpperCase();
 
-        const toUserObj = userMap[toUserName];
-        await tx.settlement.create({
-          data: {
-            groupId,
-            fromUserId: paidById,
-            toUserId: toUserObj.id,
-            amount,
-            currency,
-            date: dateObj,
-            isApproved: true,
-          },
-        });
+    if (row.isSettlement === true) {
+      let toUserName = '';
+      const desc = (row.description || '').toLowerCase();
+      if (desc.includes('to aisha') || row.participantsStr === 'Aisha') toUserName = 'Aisha';
+      else if (desc.includes('to priya') || row.participantsStr === 'Priya') toUserName = 'Priya';
+      else if (desc.includes('to meera') || row.participantsStr === 'Meera') toUserName = 'Meera';
+      else if (desc.includes('to rohan') || row.participantsStr === 'Rohan') toUserName = 'Rohan';
+      else {
+        const parts = (row.participantsStr || '').split('|').map(p => normalizeName(p.trim()));
+        toUserName = parts[0] || 'Aisha';
+      }
+
+      const toUserObj = userMap[toUserName];
+      if (!toUserObj) {
+        console.warn(`Skipping settlement row ${row.csvRow}: unknown target ${toUserName}`);
         continue;
       }
 
-      const splitType = (row.splitType || 'EQUAL').trim().toUpperCase();
-      let participants = (row.participantsStr || '')
-        .split('|')
-        .map(p => p.trim())
-        .filter(p => p !== '')
-        .map(normalizeName);
-
-      // Handle AUTO_ALL or empty
-      if (row.participantsStr === 'AUTO_ALL' || participants.length === 0) {
-        const memberships = await tx.membership.findMany({
-          where: { groupId },
-          include: { user: true },
-        });
-        const active = memberships.filter(m => {
-          const joined = new Date(m.joinedAt).getTime();
-          const left = m.leftAt ? new Date(m.leftAt).getTime() : Infinity;
-          const t = dateObj.getTime();
-          return t >= joined && t <= left;
-        });
-        participants = active.map(m => m.user.name);
-      }
-
-      const participantUserIds = participants.map(n => userMap[n].id);
-
-      const exp = await tx.expense.create({
+      await prisma.settlement.create({
         data: {
-          csvId: parseInt(row.id, 10) || null,
           groupId,
-          description: row.description || 'Imported',
+          fromUserId: paidById,
+          toUserId: toUserObj.id,
           amount,
           currency,
           date: dateObj,
-          paidById,
-          splitType,
-          isSettlement: false,
-          status: 'APPROVED',
+          isApproved: true,
         },
       });
-
-      const numParts = participantUserIds.length;
-      const shares = (row.sharesStr || '')
-        .split('|')
-        .map(s => s.trim())
-        .filter(s => s !== '')
-        .map(Number);
-
-      let splitAmounts = {};
-      if (splitType === 'EQUAL') {
-        const share = amount / numParts;
-        participantUserIds.forEach(id => {
-          splitAmounts[id] = { amount: share, percentage: 100 / numParts };
-        });
-      } else if (splitType === 'PERCENTAGE') {
-        participantUserIds.forEach((id, idx) => {
-          const pct = shares[idx] || (100 / numParts);
-          splitAmounts[id] = { amount: amount * (pct / 100), percentage: pct };
-        });
-      } else if (splitType === 'EXACT') {
-        participantUserIds.forEach((id, idx) => {
-          const val = shares[idx] || (amount / numParts);
-          splitAmounts[id] = { amount: val, percentage: null };
-        });
-      }
-
-      for (const id of participantUserIds) {
-        await tx.split.create({
-          data: {
-            expenseId: exp.id,
-            userId: id,
-            amount: splitAmounts[id].amount,
-            percentage: splitAmounts[id].percentage,
-          },
-        });
-      }
+      continue;
     }
 
-    // Write logs
-    for (const log of anomaliesLog) {
-      await tx.importAnomaly.create({
-        data: log,
+    const splitType = (row.splitType || 'EQUAL').trim().toUpperCase();
+    let participants = (row.participantsStr || '')
+      .split('|')
+      .map(p => p.trim())
+      .filter(p => p !== '')
+      .map(normalizeName);
+
+    if (row.participantsStr === 'AUTO_ALL' || participants.length === 0) {
+      const memberships = await prisma.membership.findMany({
+        where: { groupId },
+        include: { user: true },
+      });
+      const active = memberships.filter(m => {
+        const joined = new Date(m.joinedAt).getTime();
+        const left = m.leftAt ? new Date(m.leftAt).getTime() : Infinity;
+        const t = dateObj.getTime();
+        return t >= joined && t <= left;
+      });
+      participants = active.map(m => m.user.name);
+    }
+
+    const participantUserIds = participants
+      .map(n => userMap[n])
+      .filter(Boolean)
+      .map(u => u.id);
+
+    if (participantUserIds.length === 0) {
+      console.warn(`Skipping row ${row.csvRow}: no valid participants found`);
+      continue;
+    }
+
+    const exp = await prisma.expense.create({
+      data: {
+        csvId: Number.isFinite(Number(row.id)) ? Number(row.id) : null,
+        groupId,
+        description: row.description || 'Imported',
+        amount,
+        currency,
+        date: dateObj,
+        paidById,
+        splitType,
+        isSettlement: false,
+        status: 'APPROVED',
+      },
+    });
+
+    const shares = (row.sharesStr || '')
+      .split('|')
+      .map(s => s.trim())
+      .filter(s => s !== '')
+      .map(Number);
+
+    const splitRecords = [];
+    if (splitType === 'PERCENTAGE') {
+      participantUserIds.forEach((userId, idx) => {
+        const pct = shares[idx] || 100 / participantUserIds.length;
+        splitRecords.push({
+          expenseId: exp.id,
+          userId,
+          amount: parseFloat((amount * (pct / 100)).toFixed(2)),
+          percentage: pct,
+        });
+      });
+    } else if (splitType === 'EXACT') {
+      participantUserIds.forEach((userId, idx) => {
+        splitRecords.push({
+          expenseId: exp.id,
+          userId,
+          amount: shares[idx] || parseFloat((amount / participantUserIds.length).toFixed(2)),
+          percentage: null,
+        });
+      });
+    } else {
+      const equalAmount = parseFloat((amount / participantUserIds.length).toFixed(2));
+      const percentage = parseFloat((100 / participantUserIds.length).toFixed(2));
+      participantUserIds.forEach((userId) => {
+        splitRecords.push({
+          expenseId: exp.id,
+          userId,
+          amount: equalAmount,
+          percentage,
+        });
       });
     }
-  });
+
+    for (const split of splitRecords) {
+      await prisma.split.create({ data: split });
+    }
+  }
+
+  for (const log of anomaliesLog) {
+    await prisma.importAnomaly.create({ data: log });
+  }
 
   console.log('Database import completed successfully!');
 
