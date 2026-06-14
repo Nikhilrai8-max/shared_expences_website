@@ -226,7 +226,7 @@ function App() {
       toUserId: parseInt(setTo, 10),
       amount: parseFloat(setAmount),
       currency: setCurrency,
-      date: dateVal,
+      date: setDateVal,
     };
 
     try {
