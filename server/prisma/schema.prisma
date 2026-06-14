@@ -10,6 +10,7 @@ generator client {
 model User {
   id              Int              @id @default(autoincrement())
   name            String           @unique
+  password        String?
   email           String?
   memberships     Membership[]
   paidExpenses    Expense[]        @relation("PaidExpenses")

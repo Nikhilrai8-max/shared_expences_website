@@ -7,6 +7,7 @@ function App() {
   // --- STATE ---
   const [users, setUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('token') || null);
   const [groups, setGroups] = useState([]);
   const [activeGroup, setActiveGroup] = useState(null);
   const [activeTab, setActiveTab] = useState('dashboard'); // dashboard, ledger, import, report
@@ -40,6 +41,7 @@ function App() {
   // User registration Form State
   const [newUserName, setNewUserName] = useState('');
   const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserPassword, setNewUserPassword] = useState('');
 
   // Add Member Form State
   const [addMemberUserId, setAddMemberUserId] = useState('');
@@ -122,25 +124,48 @@ function App() {
   const handleCreateUser = async () => {
     if (!newUserName || newUserName.trim() === '') return null;
     try {
-      const res = await fetch(`${API_BASE}/users`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newUserName.trim(), email: newUserEmail.trim() || undefined }),
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        alert(`Failed to create user: ${err.error}`);
-        return null;
-      }
-      const user = await res.json();
+      if (password) {
+        const res = await fetch(`${API_BASE}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: newUserName.trim(), email: newUserEmail.trim() || undefined, password }),
+        });
+        if (!res.ok) { const err = await res.json(); alert(`Failed to register: ${err.error}`); return null; }
+        const { user, token: tok } = await res.json();
+        if (tok) { setToken(tok); localStorage.setItem('token', tok); }
+        await fetchUsers();
+        setNewUserName(''); setNewUserEmail(''); setNewUserPassword('');
+        return user;
+      } else {
+        const res = await fetch(`${API_BASE}/users`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: newUserName.trim(), email: newUserEmail.trim() || undefined }),
+        });
+        if (!res.ok) { const err = await res.json(); alert(`Failed to create user: ${err.error}`); return null; }
+        const user = await res.json();
       await fetchUsers();
-      setNewUserName('');
-      setNewUserEmail('');
-      return user;
+        setNewUserName(''); setNewUserEmail('');
+        return user;
     } catch (err) {
       console.error('Error creating user:', err);
       return null;
     }
+  };
+
+  const handleLogin = async ({ name, email, password }) => {
+    try {
+      const res = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
+      });
+      if (!res.ok) { const err = await res.json(); alert(`Login failed: ${err.error}`); return null; }
+      const { user, token: tok } = await res.json();
+      if (tok) { setToken(tok); localStorage.setItem('token', tok); }
+      await fetchUsers();
+      return user;
+    } catch (e) { console.error('Login error', e); return null; }
   };
 
   const handleAddMember = async (e) => {
@@ -160,9 +185,11 @@ function App() {
         userIdToAdd = String(created.id);
       }
 
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
       const res = await fetch(`${API_BASE}/groups/${activeGroup.id}/members`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ userId: parseInt(userIdToAdd, 10), joinedAt: addMemberJoinDate }),
       });
 
@@ -255,9 +282,11 @@ function App() {
     };
 
     try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
       const res = await fetch(`${API_BASE}/expenses`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(payload),
       });
 
@@ -294,9 +323,11 @@ function App() {
     };
 
     try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
       const res = await fetch(`${API_BASE}/settlements`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(payload),
       });
 
@@ -488,9 +519,11 @@ function App() {
     });
 
     try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
       const res = await fetch(`${API_BASE}/import/finalize`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           resolvedRows: finalizedRows,
           anomaliesLog,
@@ -1304,13 +1337,20 @@ function App() {
           <form className="modal-content" onSubmit={async (e) => {
             e.preventDefault();
             if (loginUserId && loginUserId !== 'CREATE_NEW') {
-              const u = users.find(x => x.id === parseInt(loginUserId, 10));
-              if (u) setCurrentUser(u);
+              // Login existing user by prompting for password
+              const selected = users.find(x => x.id === parseInt(loginUserId, 10));
+              if (!selected) { alert('Select a valid user'); return; }
+              const pw = prompt('Enter password for ' + selected.name + ' (for demo only)');
+              if (!pw) { alert('Password required'); return; }
+              const logged = await handleLogin({ name: selected.name, password: pw });
+              if (logged) setCurrentUser(logged);
               setShowUserModal(false);
               return;
             }
+            // CREATE_NEW flow - require name and password
             if (!newUserName || newUserName.trim() === '') { alert('Enter a name'); return; }
-            const created = await handleCreateUser();
+            if (!newUserPassword || newUserPassword.length < 4) { alert('Enter a password (min 4 chars)'); return; }
+            const created = await handleCreateUser(newUserPassword);
             if (created) setCurrentUser(created);
             setShowUserModal(false);
           }}>
@@ -1336,6 +1376,10 @@ function App() {
                   <div className="form-group">
                     <label className="form-label">Email (optional)</label>
                     <input className="form-input" value={newUserEmail} onChange={(e) => setNewUserEmail(e.target.value)} />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Password</label>
+                    <input type="password" className="form-input" value={newUserPassword} onChange={(e) => setNewUserPassword(e.target.value)} />
                   </div>
                 </>
               )}
