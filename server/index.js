@@ -9,7 +9,9 @@ import { calculateBalances, getLedger, getExchangeRate } from './services/calcul
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'please-change-this-secret';
+dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET || 'nikhilrai339';
 
 function authenticateToken(req, res, next) {
   const auth = req.headers['authorization'] || req.headers['Authorization'];
