@@ -1,8 +1,8 @@
 # Shared Expenses Tracker (Brutalist boxy Edition)
 
-A professional React + Node/Express + SQLite shared expenses web application built for a group of 6 flatmates (Aisha, Rohan, Priya, Meera, Sam, Dev) to ingest their messy historical spreadsheet, resolve anomalies interactively, track balance ledgers, and minimize peer-to-peer debts.
+A professional React + Node/Express shared expenses web application built for a group of 6 flatmates (Aisha, Rohan, Priya, Meera, Sam, Dev) to ingest their messy historical spreadsheet, resolve anomalies interactively, track balance ledgers, and minimize peer-to-peer debts.
 
-Designed with a premium dark-themed boxy aesthetic enforcing strictly **zero rounded corners** (`border-radius: 0px !important`).
+Designed with a bright, modern aesthetic and clean rounded components.
 
 ---
 
@@ -10,7 +10,7 @@ Designed with a premium dark-themed boxy aesthetic enforcing strictly **zero rou
 
 - **Frontend**: React (Vite-based Single Page App) styled with Vanilla CSS.
 - **Backend**: Node.js & Express API server.
-- **Database**: SQLite (relational DB) managed via Prisma ORM.
+- **Database**: PostgreSQL managed via Prisma ORM (stable deployment-ready).
 - **Math Engine**:
   - Net balance tracking with multi-currency conversion to base `INR` (using rates: 1 USD = 83 INR, 1 EUR = 90 INR).
   - Date-aware membership validation preventing timeline violations.
@@ -30,10 +30,19 @@ npm run install:all
 ```
 
 ### 2. Initialize Database & Seed
-Create the SQLite database, generate the Prisma Client, and seed the default flatmates and membership dates:
+Set up PostgreSQL locally or via a hosted provider, then set `DATABASE_URL` before initializing.
+
+For local development with Postgres, create a `.env` file inside `server/` and add:
+```env
+DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/spreetail"
+JWT_SECRET="a-strong-secret"
+```
+
+Then run:
 ```bash
-npm run init:db
-npm run seed:db
+cd server
+npm run db:migrate
+npm run db:seed
 ```
 
 ### 3. Run the Servers Concurrently

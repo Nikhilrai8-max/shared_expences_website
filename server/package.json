@@ -9,6 +9,7 @@
     "dev": "nodemon index.js",
     "stop": "node stop-server.js",
     "db:init": "npx prisma db push",
+    "db:migrate": "npx prisma migrate dev --name init",
     "db:seed": "node prisma/seed.js",
     "db:studio": "npx prisma studio"
   },

@@ -1,6 +1,6 @@
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -8,15 +8,15 @@ generator client {
 }
 
 model User {
-  id              Int              @id @default(autoincrement())
-  name            String           @unique
+  id              Int          @id @default(autoincrement())
+  name            String       @unique
   password        String?
   email           String?
   memberships     Membership[]
-  paidExpenses    Expense[]        @relation("PaidExpenses")
+  paidExpenses    Expense[]    @relation("PaidExpenses")
   splits          Split[]
-  settlementsFrom Settlement[]     @relation("SettlementsFrom")
-  settlementsTo   Settlement[]     @relation("SettlementsTo")
+  settlementsFrom Settlement[] @relation("SettlementsFrom")
+  settlementsTo   Settlement[] @relation("SettlementsTo")
 }
 
 model Group {
@@ -49,7 +49,7 @@ model Expense {
   currency     String
   date         DateTime
   paidById     Int
-  splitType    String   // EQUAL, PERCENTAGE, EXACT
+  splitType    String // EQUAL, PERCENTAGE, EXACT
   isSettlement Boolean  @default(false)
   status       String   @default("APPROVED") // APPROVED, PENDING, REJECTED
   group        Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
@@ -58,13 +58,13 @@ model Expense {
 }
 
 model Split {
-  id        Int     @id @default(autoincrement())
-  expenseId Int
-  userId    Int
-  amount    Float
+  id         Int     @id @default(autoincrement())
+  expenseId  Int
+  userId     Int
+  amount     Float
   percentage Float?
-  expense   Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expense    Expense @relation(fields: [expenseId], references: [id], onDelete: Cascade)
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([expenseId, userId])
 }
