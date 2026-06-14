@@ -27,6 +27,27 @@ function App() {
   // Modal States for Manual Actions
   const [showExpenseModal, setShowExpenseModal] = useState(false);
   const [showSettlementModal, setShowSettlementModal] = useState(false);
+  const [showGroupModal, setShowGroupModal] = useState(false);
+  const [showMemberModal, setShowMemberModal] = useState(false);
+  const [showUserModal, setShowUserModal] = useState(false);
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
+  
+  // Group creation Form State
+  const [groupName, setGroupName] = useState('');
+  const [groupDesc, setGroupDesc] = useState('');
+
+  // User registration Form State
+  const [newUserName, setNewUserName] = useState('');
+  const [newUserEmail, setNewUserEmail] = useState('');
+
+  // Add Member Form State
+  const [addMemberUserId, setAddMemberUserId] = useState('');
+  const [addMemberJoinDate, setAddMemberJoinDate] = useState(new Date().toISOString().split('T')[0]);
+
+  // Leave Member Form State
+  const [leaveMemberUserId, setLeaveMemberUserId] = useState(null);
+  const [leaveMemberUserName, setLeaveMemberUserName] = useState('');
+  const [leaveMemberDate, setLeaveMemberDate] = useState(new Date().toISOString().split('T')[0]);
   
   // Manual Expense Form State
   const [expDesc, setExpDesc] = useState('');

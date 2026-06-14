@@ -37,6 +37,26 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
+// 1.1 Create a new User (Register flatmate)
+app.post('/api/users', async (req, res) => {
+  try {
+    const { name, email } = req.body;
+    if (!name) {
+      return res.status(400).json({ error: 'User name is required' });
+    }
+    const newUser = await prisma.user.create({
+      data: {
+        name: name.trim(),
+        email: email ? email.trim() : `${name.trim().toLowerCase()}@flatmates.com`,
+      },
+    });
+    res.json(newUser);
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).json({ error: 'Failed to create user. Name might already be taken.' });
+  }
+});
+
 // 2. Get all groups
 app.get('/api/groups', async (req, res) => {
   try {
@@ -73,6 +93,110 @@ app.get('/api/groups/:groupId/members', async (req, res) => {
   } catch (error) {
     console.error('Error fetching group members:', error);
     res.status(500).json({ error: 'Failed to fetch group members' });
+  }
+});
+
+// 2.1 Create a new group
+app.post('/api/groups', async (req, res) => {
+  try {
+    const { name, description } = req.body;
+    if (!name) {
+      return res.status(400).json({ error: 'Group name is required' });
+    }
+
+    const group = await prisma.group.create({
+      data: {
+        name,
+        description,
+      },
+    });
+    res.json(group);
+  } catch (error) {
+    console.error('Error creating group:', error);
+    res.status(500).json({ error: 'Failed to create group. Name might already exist.' });
+  }
+});
+
+// 3.1 Add a member to a group
+app.post('/api/groups/:groupId/members', async (req, res) => {
+  try {
+    const groupId = parseInt(req.params.groupId, 10);
+    const { userId, joinedAt } = req.body;
+
+    if (!userId || !joinedAt) {
+      return res.status(400).json({ error: 'User ID and join date are required' });
+    }
+
+    // Check if membership already exists
+    const existing = await prisma.membership.findUnique({
+      where: {
+        groupId_userId: {
+          groupId,
+          userId: parseInt(userId, 10),
+        },
+      },
+    });
+
+    if (existing) {
+      // If they already exist, we can update their joinedAt and clear leftAt to re-add them
+      const updated = await prisma.membership.update({
+        where: { id: existing.id },
+        data: {
+          joinedAt: new Date(joinedAt),
+          leftAt: null,
+        },
+      });
+      return res.json(updated);
+    }
+
+    const newMembership = await prisma.membership.create({
+      data: {
+        groupId,
+        userId: parseInt(userId, 10),
+        joinedAt: new Date(joinedAt),
+      },
+    });
+    res.json(newMembership);
+  } catch (error) {
+    console.error('Error adding member to group:', error);
+    res.status(500).json({ error: 'Failed to add member to group' });
+  }
+});
+
+// 3.2 Set a leave date for a group member (Soft leave)
+app.post('/api/groups/:groupId/members/:userId/leave', async (req, res) => {
+  try {
+    const groupId = parseInt(req.params.groupId, 10);
+    const userId = parseInt(req.params.userId, 10);
+    const { leftAt } = req.body;
+
+    if (!leftAt) {
+      return res.status(400).json({ error: 'Leave date is required' });
+    }
+
+    const membership = await prisma.membership.findUnique({
+      where: {
+        groupId_userId: {
+          groupId,
+          userId,
+        },
+      },
+    });
+
+    if (!membership) {
+      return res.status(404).json({ error: 'Membership not found' });
+    }
+
+    const updated = await prisma.membership.update({
+      where: { id: membership.id },
+      data: {
+        leftAt: new Date(leftAt),
+      },
+    });
+    res.json(updated);
+  } catch (error) {
+    console.error('Error setting member leave date:', error);
+    res.status(500).json({ error: 'Failed to set member leave date' });
   }
 });
 
