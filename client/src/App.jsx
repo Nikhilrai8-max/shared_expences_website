@@ -121,7 +121,7 @@ function App() {
   };
 
   // --- ADD MEMBER / CREATE USER ---
-  const handleCreateUser = async () => {
+  const handleCreateUser = async (password) => {
     if (!newUserName || newUserName.trim() === '') return null;
     try {
       if (password) {
@@ -130,11 +130,20 @@ function App() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name: newUserName.trim(), email: newUserEmail.trim() || undefined, password }),
         });
-        if (!res.ok) { const err = await res.json(); alert(`Failed to register: ${err.error}`); return null; }
+        if (!res.ok) {
+          const err = await res.json();
+          alert(`Failed to register: ${err.error}`);
+          return null;
+        }
         const { user, token: tok } = await res.json();
-        if (tok) { setToken(tok); localStorage.setItem('token', tok); }
+        if (tok) {
+          setToken(tok);
+          localStorage.setItem('token', tok);
+        }
         await fetchUsers();
-        setNewUserName(''); setNewUserEmail(''); setNewUserPassword('');
+        setNewUserName('');
+        setNewUserEmail('');
+        setNewUserPassword('');
         return user;
       } else {
         const res = await fetch(`${API_BASE}/users`, {
@@ -142,11 +151,17 @@ function App() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name: newUserName.trim(), email: newUserEmail.trim() || undefined }),
         });
-        if (!res.ok) { const err = await res.json(); alert(`Failed to create user: ${err.error}`); return null; }
+        if (!res.ok) {
+          const err = await res.json();
+          alert(`Failed to create user: ${err.error}`);
+          return null;
+        }
         const user = await res.json();
-      await fetchUsers();
-        setNewUserName(''); setNewUserEmail('');
+        await fetchUsers();
+        setNewUserName('');
+        setNewUserEmail('');
         return user;
+      }
     } catch (err) {
       console.error('Error creating user:', err);
       return null;
